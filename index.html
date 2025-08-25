@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Death Prediction Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Death Prediction Calculator</h1>
+            <p>Enter your details to see your predicted lifespan</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Input Form -->
+            <div class="input-section">
+                <form id="deathForm">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" min="1" max="120" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="food">Preferred Food Item:</label>
+                        <select id="food" name="food" required>
+                            <option value="">Select Your Preferred Food</option>
+                            <option value="salad">Fresh Salad </option>
+                            <option value="rice">Rice </option>
+                            <option value="sandwich">Sandwich </option>
+                            <option value="pizza">Pizza </option>
+                            <option value="friedchicken">Fried Chicken</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Profile Image (Optional):</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="submit-btn">Calculate My Death</button>
+                </form>
+            </div>
+
+            <!-- 2D Scene -->
+            <div class="scene-section">
+                <div class="scene">
+                    <!-- Human Figure with Shovel -->
+                    <div class="human-figure" id="humanFigure">
+                        <!-- Updated image path to use public folder -->
+                        <img src="man_shovel.png" alt="Human with shovel" class="human-image">
+                    </div>
+
+                    <!-- Death Pit (Coffin) -->
+                    <div class="death-pit" id="deathPit">
+                        <!-- Updated image path to use public folder -->
+                        <img src="coffin.png" alt="Coffin" class="coffin-image">
+                    </div>
+
+                    <!-- Ground -->
+                    <div class="ground"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-card">
+                <h2>Death Prediction Results</h2>
+                <div class="user-info">
+                    <div class="user-image" id="userImage"></div>
+                    <div class="user-details">
+                        <h3 id="userName"></h3>
+                        <p id="userAge"></p>
+                        <p id="userGender"></p>
+                        <p id="userFood"></p>
+                    </div>
+                </div>
+                <div class="prediction">
+                    <div class="lifetime-remaining">
+                        <h3>Time Remaining:</h3>
+                        <div class="time-display" id="timeRemaining"></div>
+                    </div>
+                </div>
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
