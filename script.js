@@ -59,7 +59,7 @@ form.addEventListener("submit", (e) => {
     }
     reader.readAsDataURL(imageFile)
   } else {
-    userImage.innerHTML = '<span style="font-size: 2em;">👤</span>'
+    userImage.innerHTML = '<span style="font-size: 2em;"></span>'
   }
 
   // Calculate death prediction
@@ -74,8 +74,7 @@ form.addEventListener("submit", (e) => {
   // Show results section
   resultsSection.style.display = "block"
 
-  // Scroll to results
-  resultsSection.scrollIntoView({ behavior: "smooth" })
+  
 })
 
 function calculateDeathPrediction(userData) {
@@ -240,10 +239,10 @@ function calculateDeathPrediction(userData) {
 function updateScenePosition(prediction, userData) {
   const sceneWidth = document.querySelector(".scene").offsetWidth
   const humanWidth = 120
-  const coffinWidth = 150
+  const coffinWidth = 175
   const maxDistance = sceneWidth - humanWidth - coffinWidth - 100
 
-  const { remainingYears, isInPit, isLyingDown } = prediction
+  const { remainingYears, isInPit, isLyingDown, extremeCase } = prediction
 
   console.log("[v0] Positioning debug:", {
     remainingYears,
@@ -251,20 +250,41 @@ function updateScenePosition(prediction, userData) {
     maxDistance,
     isInPit,
     isLyingDown,
+    extremeCase
   })
 
   // Reset classes
-  humanFigure.classList.remove("lying-down", "in-pit")
+  humanFigure.classList.remove("lying-down", "in-pit", "disappearing")
+  deathPit.classList.remove("consuming")
+
+  // Handle extreme cases (old age + pizza/fried chicken) - these should be in pit
+  if (extremeCase === "pizza" || extremeCase === "friedchicken") {
+    // Human is inside the coffin pit - position them centered in the coffin area and much lower
+    humanFigure.style.left = `${sceneWidth - coffinWidth + 10}px`
+    humanFigure.style.bottom = "15px" 
+    humanFigure.classList.add("lying-down", "in-pit")
+    
+    // Add disappearing animation and coffin glow after a delay
+    setTimeout(() => {
+      humanFigure.classList.add("disappearing")
+      deathPit.classList.add("consuming")
+    }, 2000) 
+    
+    return 
+  }
 
   if (isInPit) {
-    // Human is inside the coffin pit - position them centered in the coffin area and much lower
-    humanFigure.style.left = `${sceneWidth - coffinWidth + 10}px` // Center in coffin
-    humanFigure.style.bottom = "40px" // Much lower to appear inside the pit
+    humanFigure.style.left = `${sceneWidth - coffinWidth + 10}px` 
+    humanFigure.style.bottom = "15px" 
     humanFigure.classList.add("lying-down", "in-pit")
+    
+    setTimeout(() => {
+      humanFigure.classList.add("disappearing")
+      deathPit.classList.add("consuming")
+    }, 2000) // Wait 2 seconds before starting to disappear
   } else {
     let distanceFromCoffin
 
-    // Fixed logic: More remaining years = farther from coffin
     // Less remaining years = closer to coffin
     if (remainingYears >= 50) {
       // 50+ years: Maximum distance from coffin (85-95% of max distance)
@@ -307,14 +327,14 @@ function updateScenePosition(prediction, userData) {
       // INVERT the distance: More remaining years = farther from coffin (closer to left edge)
       const distanceFromLeft = maxDistance * (1 - distanceFromCoffin)
       humanFigure.style.left = `${50 + distanceFromLeft}px`
-      humanFigure.style.bottom = "50px"  // Lower position for lying down
+      humanFigure.style.bottom = "25px"  // Lower position for lying down but not in pit
       humanFigure.classList.add("lying-down")
     } else {
       // Human is standing at calculated distance
       // INVERT the distance: More remaining years = farther from coffin (closer to left edge)
       const distanceFromLeft = maxDistance * (1 - distanceFromCoffin)
       humanFigure.style.left = `${50 + distanceFromLeft}px`
-      humanFigure.style.bottom = "50px"  // Position on ground level
+      humanFigure.style.bottom = "5px"  // Position on ground level
     }
 
     console.log("[v0] Final position:", {
@@ -394,6 +414,7 @@ function getFoodDisplayName(foodKey) {
 function getStatusMessage(prediction, userData) {
   const { ageCategory, foodCategory, isInPit, remainingYears, extremeCase } = prediction
 
+
   if (extremeCase === "pizza") {
     return "💀 EXTREME DANGER: Pizza at your age?! You're literally digging your own grave!"
   } else if (extremeCase === "friedchicken") {
@@ -448,7 +469,7 @@ function getStatusMessage(prediction, userData) {
 document.addEventListener("DOMContentLoaded", () => {
   // Set initial positions
   humanFigure.style.left = "50px"
-  humanFigure.style.bottom = "50px"  // Ground level
+  humanFigure.style.bottom = "50px"  
   deathPit.style.right = "50px"
 
   // Add some interactive elements with pixelated effects
@@ -471,81 +492,9 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 })
 
-function addVisualEffects() {
   const scene = document.querySelector(".scene")
   
-  // Create cloud elements in the sky area
-  for (let i = 0; i < 5; i++) {
-    const cloud = document.createElement("div")
-    cloud.className = "cloud"
-    cloud.style.cssText = `
-      position: absolute;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 20px;
-      pointer-events: none;
-      animation: floatCloud ${8 + Math.random() * 4}s linear infinite;
-      left: ${Math.random() * 120}%;
-      top: ${10 + Math.random() * 30}%;
-      width: ${40 + Math.random() * 30}px;
-      height: ${20 + Math.random() * 15}px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      z-index: 1;
-    `
-    
-    // Add cloud puffs for more realistic cloud shape
-    const puff1 = document.createElement("div")
-    puff1.style.cssText = `
-      position: absolute;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      top: -8px;
-      left: 10px;
-    `
-    
-    const puff2 = document.createElement("div")
-    puff2.style.cssText = `
-      position: absolute;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      width: 15px;
-      height: 15px;
-      top: -5px;
-      right: 8px;
-    `
-    
-    cloud.appendChild(puff1)
-    cloud.appendChild(puff2)
-    scene.appendChild(cloud)
-  }
-}
 
-const style = document.createElement("style")
-style.textContent = `
-    @keyframes floatCloud {
-        0% {
-            transform: translateX(-100px);
-            opacity: 0;
-        }
-        10% {
-            opacity: 0.8;
-        }
-        90% {
-            opacity: 0.8;
-        }
-        100% {
-            transform: translateX(calc(100vw + 100px));
-            opacity: 0;
-        }
-    }
-    
-    .cloud {
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-    }
-`
 document.head.appendChild(style)
 
 // Initialize visual effects
